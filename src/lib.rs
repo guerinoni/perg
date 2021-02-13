@@ -30,3 +30,19 @@ pub fn grep(c: Config) -> Vec<String> {
 
     results
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn grep_single_file() {
+        let c = Config {
+            want_search: "federico",
+            filename: "Cargo.toml"
+        };
+
+        let res = grep(c);
+        assert_eq!(res, vec!["authors = [\"Federico Guerinoni <guerinoni.federico@gmail.com>\"]"]);
+    }
+}
