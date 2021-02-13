@@ -8,23 +8,16 @@ fn main() {
         return;
     }
 
-    // let file = fs::File::open(filename).unwrap();
+    let want_search = env::args().nth(1).expect("");
+    let filename = env::args().nth(2).expect("");
 
-    let c = Config::new(env::args().nth(1).expect("").as_str(), env::args().nth(2).expect("").as_str());
-    // let lines = io::BufReader::new(file).lines();
+    let c = Config::new(
+        want_search.as_str(),
+        filename.as_str(),
+    );
 
-    // let want_search = env::args().nth(1).expect("");
-
-    // let mut results = Vec::new();
-    // for l in lines {
-    //     if let Ok(line) = l {
-    //         if line.contains(want_search.as_str()) {
-    //             results.push(line);
-    //         }
-    //     }
-    // }
-
-    // for r in results {
-    //     println!("{}", r);
-    // }
+    let res = grep(c);
+    for r in res {
+        println!("{}", r);
+    }
 }
