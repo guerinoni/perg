@@ -1,6 +1,10 @@
-use std::{fs, io};
+use std::{
+    fs,
+    io::{self, BufRead},
+    path,
+};
 
-use io::BufRead;
+use walkdir::WalkDir;
 
 pub struct Config<'a> {
     want_search: &'a str,
@@ -17,12 +21,37 @@ impl<'a> Config<'a> {
 }
 
 pub fn grep(c: Config) -> Vec<String> {
-    let file = fs::File::open(c.filename).unwrap();
-    let lines = io::BufReader::new(file).lines();
     let mut results = Vec::new();
+
+    let path = path::Path::new(c.filename);
+    if !path.exists() {
+        return results;
+    }
+
+    if path::Path::is_file(path) {
+        let r = grep_single_file(path.to_str().unwrap(), c.want_search);
+        results.extend(r);
+    }
+
+    if path::Path::is_dir(path) {
+        for e in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
+            if e.metadata().unwrap().is_file() {
+                let r = grep_single_file(e.path().to_str().unwrap(), c.want_search);
+                results.extend(r);
+            }
+        }
+    }
+
+    results
+}
+
+fn grep_single_file(filename: &str, to_search: &str) -> Vec<String> {
+    let mut results = Vec::new();
+    let file = fs::File::open(filename).unwrap();
+    let lines = io::BufReader::new(file).lines();
     for l in lines {
         if let Ok(line) = l {
-            if line.contains(c.want_search) {
+            if line.contains(to_search) {
                 results.push(line);
             }
         }
@@ -39,10 +68,24 @@ mod tests {
     fn grep_single_file() {
         let c = Config {
             want_search: "federico",
-            filename: "Cargo.toml"
+            filename: "Cargo.toml",
         };
 
         let res = grep(c);
-        assert_eq!(res, vec!["authors = [\"Federico Guerinoni <guerinoni.federico@gmail.com>\"]"]);
+        assert_eq!(
+            res,
+            vec!["authors = [\"Federico Guerinoni <guerinoni.federico@gmail.com>\"]"]
+        );
+    }
+
+    #[test]
+    fn grep_current_folder() {
+        let c = Config {
+            want_search: "perg",
+            filename: "./src",
+        };
+
+        let res = grep(c);
+        assert_eq!(res.len(), 2);
     }
 }

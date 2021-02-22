@@ -11,10 +11,7 @@ fn main() {
     let want_search = env::args().nth(1).expect("");
     let filename = env::args().nth(2).expect("");
 
-    let c = Config::new(
-        want_search.as_str(),
-        filename.as_str(),
-    );
+    let c = Config::new(want_search.as_str(), filename.as_str());
 
     let res = grep(c);
     for r in res {
