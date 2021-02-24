@@ -4,8 +4,8 @@ Grep implementation in rust.
 ## Feature
 
 - [x] search in single file.
-- [ ] search in folder.
-- [ ] search in folder recursively.
+- [x] search in folder.
+- [x] search in folder recursively.
 - [ ] parallel search.
 
 ## Benchmarck 
@@ -13,25 +13,23 @@ Grep implementation in rust.
 Output of bash
 ```bash
 time grep federico Cargo.toml
-authors = ["Federico Guerinoni <guerinoni.federico@gmail.com>"]
-
 real    0m0,005s
-user    0m0,000s
-sys     0m0,005s
+user    0m0,004s
+sys     0m0,001s
 
+time grep --color=auto --exclude-dir={.git,.hg,.svn} -R federico .
+real	0m0,061s
+user	0m0,050s
+sys	    0m0,009s
 
 
 time perg federico ./Cargo.toml
-authors = ["Federico Guerinoni <guerinoni.federico@gmail.com>"]
-
 real    0m0,004s
 user    0m0,001s
 sys     0m0,004s
-```
 
-Output of zsh
-```zsh
-grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox} federico   0,00s user 0,00s system 86% cpu 0,004 total
-
-perg federico ./Cargo.toml  0,00s user 0,00s system 83% cpu 0,004 total
+time perg federico .
+real	0m0,057s
+user	0m0,050s
+sys	    0m0,008s
 ```
