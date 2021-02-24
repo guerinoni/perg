@@ -20,6 +20,14 @@ impl<'a> Config<'a> {
     }
 }
 
+fn is_hidden(entry: &walkdir::DirEntry) -> bool {
+    entry
+        .file_name()
+        .to_str()
+        .map(|s| s.starts_with('.') && s.len() > 1)
+        .unwrap_or(false)
+}
+
 pub fn grep(c: Config) -> Vec<String> {
     let mut results = Vec::new();
 
@@ -34,7 +42,12 @@ pub fn grep(c: Config) -> Vec<String> {
     }
 
     if path::Path::is_dir(path) {
-        for e in WalkDir::new(path).into_iter().filter_map(|e| e.ok()) {
+        for e in WalkDir::new(path)
+            .into_iter()
+            .filter_entry(|e| !is_hidden(e))
+            .filter(|e| e.is_ok())
+            .filter_map(|e| e.ok())
+        {
             if e.metadata().unwrap().is_file() {
                 let r = grep_single_file(e.path().to_str().unwrap(), c.want_search);
                 results.extend(r);
@@ -79,13 +92,22 @@ mod tests {
     }
 
     #[test]
-    fn grep_current_folder() {
+    fn grep_current_subfolder() {
         let c = Config {
             want_search: "perg",
             filename: "./src",
         };
 
-        let res = grep(c);
-        assert_eq!(res.len(), 2);
+        assert_eq!(grep(c).len(), 2);
+    }
+
+    #[test]
+    fn grep_current_folder() {
+        let c = Config {
+            want_search: "readme",
+            filename: ".",
+        };
+
+        assert_eq!(grep(c).len(), 3);
     }
 }
