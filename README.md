@@ -29,7 +29,7 @@ user    0m0,001s
 sys     0m0,004s
 
 time perg federico .
-real	0m0,057s
-user	0m0,050s
-sys	    0m0,008s
+real	0m0,006s
+user	0m0,007s
+sys	    0m0,003s
 ```

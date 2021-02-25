@@ -4,6 +4,8 @@ use std::{
     path,
 };
 
+use rayon::iter::{IntoParallelIterator, ParallelBridge, ParallelIterator};
+
 use walkdir::WalkDir;
 
 pub struct Config<'a> {
@@ -29,16 +31,18 @@ fn is_hidden(entry: &walkdir::DirEntry) -> bool {
 }
 
 pub fn grep(c: Config) -> Vec<String> {
-    let mut results = Vec::new();
-
     let path = path::Path::new(c.filename);
     if !path.exists() {
-        return results;
+        return Vec::new();
     }
 
     if path::Path::is_file(path) {
         let r = grep_single_file(path.to_str().unwrap(), c.want_search);
-        results.extend(r);
+        let mut results = Vec::new();
+        for i in r {
+            results.push(i.unwrap());
+        }
+        return results;
     }
 
     if path::Path::is_dir(path) {
@@ -50,27 +54,27 @@ pub fn grep(c: Config) -> Vec<String> {
         {
             if e.metadata().unwrap().is_file() {
                 let r = grep_single_file(e.path().to_str().unwrap(), c.want_search);
-                results.extend(r);
+                let mut results = Vec::new();
+                for i in r {
+                    results.push(i.unwrap());
+                }
+                dbg!(results.clone());
+                return results;
             }
         }
     }
 
-    results
+    Vec::new()
 }
 
-fn grep_single_file(filename: &str, to_search: &str) -> Vec<String> {
-    let mut results = Vec::new();
+fn grep_single_file(filename: &str, to_search: &str) -> Vec<Result<String, io::Error>> {
     let file = fs::File::open(filename).unwrap();
     let lines = io::BufReader::new(file).lines();
-    for l in lines {
-        if let Ok(line) = l {
-            if line.contains(to_search) {
-                results.push(line);
-            }
-        }
-    }
-
-    results
+    lines
+        .par_bridge()
+        .into_par_iter()
+        .filter(|l| l.is_ok() && l.as_ref().unwrap().contains(to_search))
+        .collect::<Vec<_>>()
 }
 
 #[cfg(test)]
@@ -94,7 +98,7 @@ mod tests {
     #[test]
     fn grep_current_subfolder() {
         let c = Config {
-            want_search: "perg",
+            want_search: "readme",
             filename: "./src",
         };
 
@@ -108,6 +112,6 @@ mod tests {
             filename: ".",
         };
 
-        assert_eq!(grep(c).len(), 3);
+        assert_eq!(grep(c).len(), 2);
     }
 }
