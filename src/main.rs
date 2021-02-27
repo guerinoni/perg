@@ -13,8 +13,5 @@ fn main() {
 
     let c = Config::new(want_search.as_str(), filename.as_str());
 
-    let res = grep(c);
-    for r in res {
-        println!("{}", r);
-    }
+    grep(c);
 }
