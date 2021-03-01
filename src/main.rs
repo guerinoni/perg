@@ -1,17 +1,23 @@
-use std::env;
-
+use clap::{App, Arg};
 use perg::*;
 
 fn main() {
-    if env::args().len() < 3 {
-        println!("not enough args, required <string> <file>");
-        return;
-    }
+    let matches = App::new("perg")
+        .version("0.1.0")
+        .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
+        .about("grep like tool. Search for PATTERNS in each FILE.")
+        .arg(
+            Arg::new("PATTERNS")
+                .about("Can contain multiple patterns separated by newlines.")
+                .required(true),
+        )
+        .arg(Arg::new("FILE").required(true).multiple(true))
+        .get_matches();
 
-    let want_search = env::args().nth(1).expect("");
-    let filename = env::args().nth(2).expect("");
-
-    let c = Config::new(want_search.as_str(), filename.as_str());
+    let c = Config::new(
+        matches.value_of("PATTERNS").unwrap(),
+        matches.value_of("FILE").unwrap(),
+    );
 
     grep(c);
 }
