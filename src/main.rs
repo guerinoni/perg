@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use perg::*;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 fn main() {
     let matches = App::new("perg")
@@ -19,5 +20,10 @@ fn main() {
         matches.value_of("FILE").unwrap(),
     );
 
-    grep(c);
+    match grep(c) {
+        Ok(results) => {
+            results.par_iter().for_each(|item| println!("{}", item));
+        }
+        Err(e) => println!("{}", e),
+    }
 }

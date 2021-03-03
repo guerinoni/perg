@@ -13,29 +13,28 @@ pub struct Config<'a> {
 
 impl<'a> Config<'a> {
     pub fn new(pattern: &'a str, filename: &'a str) -> Config<'a> {
-        Config {
-            pattern,
-            filename,
-        }
+        Config { pattern, filename }
     }
 }
 
-pub fn grep(c: Config) {
+pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
     let path = path::Path::new(c.filename);
     if !path.exists() {
         println!("No such file or directory");
-        return;
+        return Err("No such file or directory");
     }
 
     if path.is_file() {
         let file = fs::File::open(path).unwrap();
         let lines = io::BufReader::new(file).lines();
-        lines
+        let items: Vec<String> = lines
             .par_bridge()
             .into_par_iter()
             .filter_map(|i| i.ok())
             .filter(|i| i.contains(c.pattern))
-            .for_each(|item| println!("{}: {}", path.display(), item));
+            .collect();
+
+        return Ok(items);
     }
 
     // WalkDir::new(c.filename)
@@ -55,6 +54,8 @@ pub fn grep(c: Config) {
     //             .filter(|i| i.contains(c.want_search))
     //             .for_each(|item| println!("{}: {}", e.path().display(), item));
     //     })
+
+    Ok(Vec::new())
 }
 
 // fn is_hidden(entry: &walkdir::DirEntry) -> bool {
@@ -64,3 +65,27 @@ pub fn grep(c: Config) {
 //         .map(|s| s.starts_with('.') && s.len() > 1)
 //         .unwrap_or(false)
 // }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn return_path_invalid() {
+        let c = Config::new("hello", "/home/invalid");
+        let r = grep(c);
+        assert_eq!(r, Err("No such file or directory"));
+    }
+
+    #[test]
+    fn grep_single_file() {
+        let c = Config::new("federico", "./Cargo.toml");
+        let r = grep(c);
+        assert_eq!(
+            r,
+            Ok(vec![String::from(
+                "authors = [\"Federico Guerinoni <guerinoni.federico@gmail.com>\"]"
+            )])
+        );
+    }
+}
