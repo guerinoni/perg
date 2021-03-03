@@ -7,14 +7,14 @@ use std::{
 use rayon::iter::{IntoParallelIterator, ParallelBridge, ParallelIterator};
 
 pub struct Config<'a> {
-    want_search: &'a str,
+    pattern: &'a str,
     filename: &'a str,
 }
 
 impl<'a> Config<'a> {
-    pub fn new(want_search: &'a str, filename: &'a str) -> Config<'a> {
+    pub fn new(pattern: &'a str, filename: &'a str) -> Config<'a> {
         Config {
-            want_search,
+            pattern,
             filename,
         }
     }
@@ -34,7 +34,7 @@ pub fn grep(c: Config) {
             .par_bridge()
             .into_par_iter()
             .filter_map(|i| i.ok())
-            .filter(|i| i.contains(c.want_search))
+            .filter(|i| i.contains(c.pattern))
             .for_each(|item| println!("{}: {}", path.display(), item));
     }
 
