@@ -17,8 +17,8 @@ jobs:
       - name: Check formatting
         run: cargo fmt -- --check
 
-      - name: Build
-        run: cargo build
+      - name: Test
+        run: cargo test
 
       - name: Install clippy
         run: rustup component add clippy
