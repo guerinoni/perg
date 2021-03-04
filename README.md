@@ -7,6 +7,7 @@ Grep implementation in rust.
 ## Features
 
 - [x] search in single file.
+- [x] show line number (-n or --line-number)
 
 ## Contributing
 
