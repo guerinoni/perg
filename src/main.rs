@@ -8,8 +8,14 @@ fn main() {
         .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
         .about("grep like tool. Search for PATTERNS in each FILE.")
         .arg(
+            Arg::new("line-number")
+                .long("line-number")
+                .short('n')
+                .about("print line number with output lines"),
+        )
+        .arg(
             Arg::new("PATTERNS")
-                .about("Can contain multiple patterns separated by newlines.")
+                .about("can contain multiple patterns separated by newlines.")
                 .required(true),
         )
         .arg(Arg::new("FILE").required(true).multiple(true))
@@ -18,6 +24,7 @@ fn main() {
     let c = Config::new(
         matches.value_of("PATTERNS").unwrap(),
         matches.value_of("FILE").unwrap(),
+        matches.is_present("line-number"),
     );
 
     match grep(c) {
