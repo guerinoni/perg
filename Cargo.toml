@@ -10,3 +10,9 @@ edition = "2018"
 rayon = "1.5"
 # walkdir = "2"
 clap = "3.0.0-beta.2"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,63 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-20.04
+            artifact_name: ./target/release/perg
+            asset_name: perg-linux-amd64
+
+           - os: windows-latest
+            artifact_name: ./target/release/perg.exe
+            asset_name: perg-windows-amd64
+
+           - os: macos-latest
+            artifact_name: ./target/release/perg
+            asset_name: perg-macos-amd64
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: cargo build --release
+
+    - name: Upload binaries
+      uses: svenstaro/upload-release-action@2.2.1
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
+        tag: ${{ github.ref }}
+
+    
+  embedded:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Install cross
+      run: cargo install cross
+
+    - name: Build for armv7-gnueabihf
+      run: cross build --target armv7-unknown-linux-gnueabihf --release
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@2.2.1
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/armv7-unknown-linux-gnueabihf/release/perg
+        asset_name: perg-armv7
+        tag: ${{ github.ref }}
