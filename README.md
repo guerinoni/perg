@@ -1,6 +1,7 @@
 # perg
 
 [![CI](https://github.com/guerinoni/perg/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/guerinoni/perg/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/guerinoni/perg/branch/main/graph/badge.svg?token=A198N28TVV)](https://codecov.io/gh/guerinoni/perg)
 
 Grep implementation in rust.
 
