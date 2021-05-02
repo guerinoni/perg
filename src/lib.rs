@@ -1,6 +1,6 @@
 use std::{
     fs,
-    io::{self, BufRead},
+    io::{self, BufRead, Read},
     path,
 };
 
@@ -21,8 +21,17 @@ impl<'a> Config<'a> {
 }
 
 pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
-    let mut items = Vec::new();
+    if c.pattern == "-" {
+        let mut buffer = String::new();
+        let r = io::stdin().read_to_string(&mut buffer).unwrap_or_default();
+        dbg!(r);
+    }
 
+    if c.filenames.len() == 1 && c.filenames[0] == "-" {
+        dbg!("read from stdin");
+    }
+
+    let mut items = Vec::new();
     for path in c.filenames {
         let path = path::Path::new(path);
         if !path.exists() {
