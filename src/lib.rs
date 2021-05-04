@@ -23,12 +23,17 @@ impl<'a> Config<'a> {
 pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
     if c.pattern == "-" {
         let mut buffer = String::new();
-        let r = io::stdin().read_to_string(&mut buffer).unwrap_or_default();
-        dbg!(r);
+        io::stdin().read_to_string(&mut buffer).unwrap_or_default();
     }
 
     if c.filenames.len() == 1 && c.filenames[0] == "-" {
-        dbg!("read from stdin");
+        let stdin = io::stdin();
+        for line in stdin.lock().lines() {
+            let item = line.unwrap_or_default();
+            if item.contains(c.pattern) {
+                println!("{}", item);
+            }
+        }
     }
 
     let mut items = Vec::new();
