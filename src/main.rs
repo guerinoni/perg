@@ -21,7 +21,13 @@ fn main() {
             Arg::new("line-number")
                 .long("line-number")
                 .short('n')
-                .about("print line number with output lines"),
+                .about("print line number with output lines."),
+        )
+        .arg(
+            Arg::new("recursive")
+                .long("recursive")
+                .short('r')
+                .about("search recursive in folders."),
         )
         .get_matches();
 
@@ -29,6 +35,7 @@ fn main() {
         matches.value_of("PATTERNS").unwrap(),
         matches.values_of("FILE").unwrap_or_default().collect(),
         matches.is_present("line-number"),
+        matches.is_present("recursive"),
     );
 
     match grep(c) {

@@ -8,14 +8,16 @@ pub struct Config<'a> {
     pattern: &'a str,
     filenames: Vec<&'a str>,
     line_number: bool,
+    recursive: bool,
 }
 
 impl<'a> Config<'a> {
-    pub fn new(pattern: &'a str, filenames: Vec<&'a str>, line_number: bool) -> Config<'a> {
+    pub fn new(pattern: &'a str, filenames: Vec<&'a str>, line_number: bool, recursive: bool) -> Config<'a> {
         Config {
             pattern,
             filenames,
             line_number,
+            recursive,
         }
     }
 }
@@ -72,14 +74,14 @@ mod tests {
 
     #[test]
     fn return_path_invalid() {
-        let c = Config::new("hello", vec!["/home/invalid"], false);
+        let c = Config::new("hello", vec!["/home/invalid"], false, false);
         let r = grep(c);
         assert_eq!(r, Err("No such file or directory"));
     }
 
     #[test]
     fn grep_single_file() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], false);
+        let c = Config::new("federico", vec!["./Cargo.toml"], false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -91,7 +93,7 @@ mod tests {
 
     #[test]
     fn grep_two_file() {
-        let c = Config::new("federico", vec!["./Cargo.toml", "./Cargo.toml"], false);
+        let c = Config::new("federico", vec!["./Cargo.toml", "./Cargo.toml"], false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -104,7 +106,7 @@ mod tests {
 
     #[test]
     fn grep_single_file_with_line_number() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], true);
+        let c = Config::new("federico", vec!["./Cargo.toml"], true, false);
         let r = grep(c);
         assert_eq!(
             r,
