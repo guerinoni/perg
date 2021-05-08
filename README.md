@@ -12,6 +12,7 @@ Grep implementation in rust.
 - [x] search in more files (i.e. `perg file.txt file.txt`)
 - [x] search from stdin (i.e. `perg -` or `perg lol -`)
 - [x] search from stdin with pipe (i.e. `cat ./Cargo.toml | perg author`)
+- [x] search in a directory.
 
 ## Contributing
 
