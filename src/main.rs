@@ -6,9 +6,11 @@ const FILE: &str = "FILE";
 const LINE_NUMBER: &str = "line-number";
 const RECURSIVE: &str = "recursive";
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 fn main() {
     let matches = App::new("perg")
-        .version("0.1.0")
+        .version(VERSION)
         .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
         .about("grep like tool. Search for PATTERNS in each FILE.")
         .arg(
