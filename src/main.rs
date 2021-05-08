@@ -6,7 +6,7 @@ const FILE: &str = "FILE";
 const LINE_NUMBER: &str = "line-number";
 const RECURSIVE: &str = "recursive";
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
     let matches = App::new("perg")
