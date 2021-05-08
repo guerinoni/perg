@@ -28,31 +28,52 @@ impl<'a> Config<'a> {
     }
 }
 
+fn search_in_file(
+    filename: &str,
+    pattern: &'_ str,
+    show_line_number: bool,
+    show_filename: bool,
+) -> Vec<String> {
+    let mut items = Vec::new();
+    let path = path::Path::new(filename);
+    if !path.is_file() {
+        return items;
+    }
+
+    let file = fs::File::open(filename).expect("can't open file");
+    let lines = io::BufReader::new(file).lines();
+    for (idx, str) in lines.enumerate() {
+        if let Ok(item) = str {
+            if item.contains(pattern) {
+                let mut s = String::from("");
+                if show_filename {
+                    s = format!("{:?}: ", filename);
+                }
+                if show_line_number {
+                    s = format!("{}{}: ", s, idx + 1);
+                }
+
+                s.push_str(item.as_str());
+                items.push(s);
+            }
+        }
+    }
+
+    items
+}
+
 pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
     let mut items = Vec::new();
     if c.recursive {
         for entry in WalkDir::new(c.filenames.get(0).unwrap()).skip_hidden(true) {
             let entry = entry.unwrap();
-            if !entry.file_type().is_file() {
-                continue;
-            }
-
-            let file = fs::File::open(entry.path()).expect("can't open file");
-            let lines = io::BufReader::new(file).lines();
-            for (idx, str) in lines.enumerate() {
-                if let Ok(item) = str {
-                    if item.contains(c.pattern) {
-                        let mut s = String::from("");
-                        s = format!("{:?}: ", entry.path().to_str().unwrap());
-                        if c.line_number {
-                            s = format!("{}{}: ", s, idx + 1);
-                        }
-
-                        s.push_str(item.as_str());
-                        items.push(s);
-                    }
-                }
-            }
+            let mut res = search_in_file(
+                entry.path().to_str().unwrap(),
+                c.pattern,
+                c.line_number,
+                true,
+            );
+            items.append(&mut res);
         }
     }
 
@@ -71,30 +92,15 @@ pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
         }
     }
 
-    for path in c.filenames {
-        let path = path::Path::new(path);
+    for filename in c.filenames {
+        let path = path::Path::new(filename);
         if !path.exists() {
             println!("No such file or directory");
             return Err("No such file or directory");
         }
 
-        if path.is_file() {
-            let file = fs::File::open(path).unwrap();
-            let lines = io::BufReader::new(file).lines();
-            for (idx, str) in lines.enumerate() {
-                if let Ok(item) = str {
-                    if item.contains(c.pattern) {
-                        let mut s = String::from("");
-                        if c.line_number {
-                            s = format!("{}: ", idx + 1);
-                        }
-
-                        s.push_str(item.as_str());
-                        items.push(s);
-                    }
-                }
-            }
-        }
+        let mut res = search_in_file(filename, c.pattern, c.line_number, false);
+        items.append(&mut res);
     }
 
     Ok(items)
@@ -167,6 +173,23 @@ mod tests {
                 String::from("\"./testdata/folder/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
                 String::from("\"./testdata/folder/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
                 String::from("\"./testdata/folder/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
+        ])
+        );
+    }
+
+    #[test]
+    fn grep_folder_with_line_numbers() {
+        let c = Config::new("nulla", vec!["./testdata"], true, true);
+        let r = grep(c);
+        assert_eq!(
+            r,
+            Ok(vec![
+                String::from("\"./testdata/lol\": 12: Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
+                String::from("\"./testdata/lol\": 23: Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
+                String::from("\"./testdata/lol\": 39: Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
+                String::from("\"./testdata/folder/lol\": 12: Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
+                String::from("\"./testdata/folder/lol\": 23: Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
+                String::from("\"./testdata/folder/lol\": 39: Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
         ])
         );
     }
