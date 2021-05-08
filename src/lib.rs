@@ -161,6 +161,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
         let c = Config::new("nulla", vec!["./testdata"], false, true);
         let r = grep(c);
@@ -178,6 +179,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
         let c = Config::new("nulla", vec!["./testdata"], true, true);
         let r = grep(c);
