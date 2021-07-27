@@ -10,6 +10,7 @@ pub struct Config<'a> {
     filenames: Vec<&'a str>,
     line_number: bool,
     recursive: bool,
+    ignore_case: bool,
 }
 
 impl<'a> Config<'a> {
@@ -18,12 +19,14 @@ impl<'a> Config<'a> {
         filenames: Vec<&'a str>,
         line_number: bool,
         recursive: bool,
+        ignore_case: bool,
     ) -> Config<'a> {
         Config {
             pattern,
             filenames,
             line_number,
             recursive,
+            ignore_case,
         }
     }
 }
@@ -33,6 +36,7 @@ fn search_in_file(
     pattern: &'_ str,
     show_line_number: bool,
     show_filename: bool,
+    ignore_case: bool,
 ) -> Vec<String> {
     let mut items = Vec::new();
     let path = path::Path::new(filename);
@@ -72,6 +76,7 @@ pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
                 c.pattern,
                 c.line_number,
                 true,
+                c.ignore_case,
             );
             items.append(&mut res);
         }
@@ -100,6 +105,7 @@ pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
         }
 
         let mut res = search_in_file(filename, c.pattern, c.line_number, false);
+        let mut res = search_in_file(filename, c.pattern, c.line_number, false, c.ignore_case);
         items.append(&mut res);
     }
 
@@ -113,14 +119,14 @@ mod tests {
 
     #[test]
     fn return_path_invalid() {
-        let c = Config::new("hello", vec!["/home/invalid"], false, false);
+        let c = Config::new("hello", vec!["/home/invalid"], false, false, false);
         let r = grep(c);
         assert_eq!(r, Err("No such file or directory"));
     }
 
     #[test]
     fn grep_single_file() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], false, false);
+        let c = Config::new("federico", vec!["./Cargo.toml"], false, false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -137,6 +143,7 @@ mod tests {
             vec!["./Cargo.toml", "./Cargo.toml"],
             false,
             false,
+            false,
         );
         let r = grep(c);
         assert_eq!(
@@ -150,7 +157,7 @@ mod tests {
 
     #[test]
     fn grep_single_file_with_line_number() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], true, false);
+        let c = Config::new("federico", vec!["./Cargo.toml"], true, false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -163,7 +170,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
-        let c = Config::new("nulla", vec!["./testdata"], false, true);
+        let c = Config::new("nulla", vec!["./testdata"], false, true, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -181,7 +188,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
-        let c = Config::new("nulla", vec!["./testdata"], true, true);
+        let c = Config::new("nulla", vec!["./testdata"], true, true, false);
         let r = grep(c);
         assert_eq!(
             r,

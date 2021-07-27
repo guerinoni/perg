@@ -5,6 +5,7 @@ const PATTERNS: &str = "PATTERNS";
 const FILE: &str = "FILE";
 const LINE_NUMBER: &str = "line-number";
 const RECURSIVE: &str = "recursive";
+const IGNORE_CASE: &str = "ignore-case";
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -35,6 +36,12 @@ fn main() {
                 .short('r')
                 .about("search recursive in folders."),
         )
+        .arg(
+            Arg::new(IGNORE_CASE)
+                .long("ignore-case")
+                .short('i')
+                .about("ignore case distinctions in patterns and data."),
+        )
         .get_matches();
 
     let c = Config::new(
@@ -42,6 +49,7 @@ fn main() {
         matches.values_of(FILE).unwrap_or_default().collect(),
         matches.is_present(LINE_NUMBER),
         matches.is_present(RECURSIVE),
+        matches.is_present(IGNORE_CASE),
     );
 
     match grep(c) {
