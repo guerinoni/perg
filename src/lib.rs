@@ -211,64 +211,27 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
-        let c = Config::new("nulla", vec!["./testdata"], false, true, false);
-        let r = grep(c);
-        assert_eq!(
-            r,
-            Ok(vec![
-                String::from("\"./testdata/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-                String::from("\"./testdata/folder/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/folder/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/folder/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-        ])
-        );
+        let c = Config::new("you", vec!["./testdata"], false, true, false);
+        let mut r = grep(c).unwrap();
+        r.sort();
+        assert_eq!(r, vec!["\"./testdata/folder/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": Third dominion you're had called green.", "\"./testdata/folder/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": Third dominion you're had called green.", "\"./testdata/lol\": Tree brought multiply land darkness had dry you're of."]);
     }
 
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_ignore_case() {
-        let c = Config::new("nulla", vec!["./testdata"], false, true, true);
-        let r = grep(c);
-        assert_eq!(
-            r,
-            Ok(vec![
-                String::from("\"./testdata/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/lol\": Nulla tincidunt purus et semper suscipit. Donec porta ex at elit cursus, eget tristique mi fermentum."),
-                String::from("\"./testdata/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/lol\": Nullam vel sollicitudin dui, sit amet tincidunt nibh. Sed pretium sem a ipsum tincidunt posuere. "),
-                String::from("\"./testdata/lol\": Morbi venenatis ex mauris, tincidunt aliquet magna pharetra vehicula. Nullam lacinia nec velit eget pharetra. "),
-                String::from("\"./testdata/lol\": Nullam sagittis faucibus varius."),
-                String::from("\"./testdata/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-                String::from("\"./testdata/lol\": Nulla hendrerit felis a mauris mollis mollis id nec mi. Etiam sit amet fringilla diam, a maximus urna."),
-                String::from("\"./testdata/folder/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/folder/lol\": Nulla tincidunt purus et semper suscipit. Donec porta ex at elit cursus, eget tristique mi fermentum."),
-                String::from("\"./testdata/folder/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/folder/lol\": Nullam vel sollicitudin dui, sit amet tincidunt nibh. Sed pretium sem a ipsum tincidunt posuere. "),
-                String::from("\"./testdata/folder/lol\": Morbi venenatis ex mauris, tincidunt aliquet magna pharetra vehicula. Nullam lacinia nec velit eget pharetra. "),
-                String::from("\"./testdata/folder/lol\": Nullam sagittis faucibus varius.",),
-                String::from("\"./testdata/folder/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-                String::from("\"./testdata/folder/lol\": Nulla hendrerit felis a mauris mollis mollis id nec mi. Etiam sit amet fringilla diam, a maximus urna."),
-        ])
-        );
+        let c = Config::new("you", vec!["./testdata"], false, true, true);
+        let mut r = grep(c).unwrap();
+        r.sort();
+        assert_eq!(r ,vec!["\"./testdata/folder/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": Third dominion you're had called green.", "\"./testdata/folder/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/folder/lol\": You.", "\"./testdata/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": Third dominion you're had called green.", "\"./testdata/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": You."]);
     }
 
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
-        let c = Config::new("nulla", vec!["./testdata"], true, true, false);
-        let r = grep(c);
-        assert_eq!(
-            r,
-            Ok(vec![
-                String::from("\"./testdata/lol\": 12: Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/lol\": 23: Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/lol\": 39: Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-                String::from("\"./testdata/folder/lol\": 12: Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
-                String::from("\"./testdata/folder/lol\": 23: Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
-                String::from("\"./testdata/folder/lol\": 39: Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
-        ])
-        );
+        let c = Config::new("you", vec!["./testdata"], true, true, false);
+        let mut r = grep(c).unwrap();
+        r.sort();
+        assert_eq!(r, vec!["\"./testdata/folder/lol\": 19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": 25: Third dominion you're had called green.", "\"./testdata/folder/lol\": 26: Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": 8: Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": 19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": 25: Third dominion you're had called green.", "\"./testdata/lol\": 26: Evening green fill you'll gathering above hath.", "\"./testdata/lol\": 8: Tree brought multiply land darkness had dry you're of."]);
     }
 }
