@@ -48,7 +48,14 @@ fn search_in_file(
     let lines = io::BufReader::new(file).lines();
     for (idx, str) in lines.enumerate() {
         if let Ok(item) = str {
-            if item.contains(pattern) {
+            let mut item_ = item.clone();
+            let mut pattern = pattern.to_string();
+            if ignore_case {
+                item_ = item_.to_lowercase();
+                pattern = pattern.to_lowercase();
+            }
+
+            if item_.contains(pattern.as_str()) {
                 let mut s = String::from("");
                 if show_filename {
                     s = format!("{:?}: ", filename);
@@ -91,7 +98,14 @@ pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
         let stdin = io::stdin();
         for line in stdin.lock().lines() {
             let item = line.unwrap_or_default();
-            if item.contains(c.pattern) {
+            let mut item_ = item.clone();
+            let mut pattern = c.pattern.to_string();
+            if c.ignore_case {
+                item_ = item_.to_lowercase();
+                pattern = pattern.to_lowercase();
+            }
+
+            if item_.contains(pattern.as_str()) {
                 println!("{}", item);
             }
         }
@@ -104,7 +118,6 @@ pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
             return Err("No such file or directory");
         }
 
-        let mut res = search_in_file(filename, c.pattern, c.line_number, false);
         let mut res = search_in_file(filename, c.pattern, c.line_number, false, c.ignore_case);
         items.append(&mut res);
     }
@@ -127,6 +140,34 @@ mod tests {
     #[test]
     fn grep_single_file() {
         let c = Config::new("federico", vec!["./Cargo.toml"], false, false, false);
+        let r = grep(c);
+        assert_eq!(
+            r,
+            Ok(vec![String::from(
+                "authors = [\"Federico Guerinoni <guerinoni.federico@gmail.com>\"]"
+            )])
+        );
+
+        let c = Config::new(
+            "federico guerinoni",
+            vec!["./Cargo.toml"],
+            false,
+            false,
+            false,
+        );
+        let r = grep(c);
+        assert_eq!(r, Ok(vec![]));
+    }
+
+    #[test]
+    fn grep_single_file_ignore_case() {
+        let c = Config::new(
+            "federico guerinoni",
+            vec!["./Cargo.toml"],
+            false,
+            false,
+            true,
+        );
         let r = grep(c);
         assert_eq!(
             r,
@@ -181,6 +222,34 @@ mod tests {
                 String::from("\"./testdata/folder/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
                 String::from("\"./testdata/folder/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
                 String::from("\"./testdata/folder/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
+        ])
+        );
+    }
+
+    #[test]
+    #[cfg(not(target_os = "windows"))]
+    fn grep_folder_ignore_case() {
+        let c = Config::new("nulla", vec!["./testdata"], false, true, true);
+        let r = grep(c);
+        assert_eq!(
+            r,
+            Ok(vec![
+                String::from("\"./testdata/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
+                String::from("\"./testdata/lol\": Nulla tincidunt purus et semper suscipit. Donec porta ex at elit cursus, eget tristique mi fermentum."),
+                String::from("\"./testdata/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
+                String::from("\"./testdata/lol\": Nullam vel sollicitudin dui, sit amet tincidunt nibh. Sed pretium sem a ipsum tincidunt posuere. "),
+                String::from("\"./testdata/lol\": Morbi venenatis ex mauris, tincidunt aliquet magna pharetra vehicula. Nullam lacinia nec velit eget pharetra. "),
+                String::from("\"./testdata/lol\": Nullam sagittis faucibus varius."),
+                String::from("\"./testdata/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
+                String::from("\"./testdata/lol\": Nulla hendrerit felis a mauris mollis mollis id nec mi. Etiam sit amet fringilla diam, a maximus urna."),
+                String::from("\"./testdata/folder/lol\": Suspendisse potenti. Curabitur vestibulum varius tellus, ut feugiat nulla ornare quis. "),
+                String::from("\"./testdata/folder/lol\": Nulla tincidunt purus et semper suscipit. Donec porta ex at elit cursus, eget tristique mi fermentum."),
+                String::from("\"./testdata/folder/lol\": Aenean aliquam lacus ex, in gravida est mollis at. Etiam consectetur luctus nulla eu porttitor. "),
+                String::from("\"./testdata/folder/lol\": Nullam vel sollicitudin dui, sit amet tincidunt nibh. Sed pretium sem a ipsum tincidunt posuere. "),
+                String::from("\"./testdata/folder/lol\": Morbi venenatis ex mauris, tincidunt aliquet magna pharetra vehicula. Nullam lacinia nec velit eget pharetra. "),
+                String::from("\"./testdata/folder/lol\": Nullam sagittis faucibus varius.",),
+                String::from("\"./testdata/folder/lol\": Aliquam pharetra nulla placerat interdum laoreet. Vestibulum facilisis metus eu erat suscipit malesuada. "),
+                String::from("\"./testdata/folder/lol\": Nulla hendrerit felis a mauris mollis mollis id nec mi. Etiam sit amet fringilla diam, a maximus urna."),
         ])
         );
     }
