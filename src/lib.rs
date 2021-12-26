@@ -76,9 +76,12 @@ fn search_in_file(
     items
 }
 
-pub fn grep(c: Config) -> Result<Vec<String>, &'static str> {
+pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
     let mut items = Vec::new();
     if c.recursive {
+        if c.filenames.is_empty() {
+            c.filenames = vec!["./"];
+        }
         for entry in WalkDir::new(c.filenames.get(0).unwrap()).skip_hidden(true) {
             let entry = entry.unwrap();
             let mut res = search_in_file(
@@ -227,6 +230,14 @@ mod tests {
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(r ,vec!["\"./testdata/folder/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": Third dominion you're had called green.", "\"./testdata/folder/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/folder/lol\": You.", "\"./testdata/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": Third dominion you're had called green.", "\"./testdata/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": You."]);
+    }
+
+    #[test]
+    #[cfg(not(target_os = "windows"))]
+    fn grep_folder_without_specify_folder() {
+        let c = Config::new("you", vec![], false, true, false);
+        let r = grep(c);
+        assert!(r.is_ok());
     }
 
     #[test]
