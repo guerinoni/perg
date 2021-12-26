@@ -15,32 +15,32 @@ fn main() {
         .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
         .about("grep like tool. Search for PATTERNS in each FILE.")
         .arg(
-            Arg::new(PATTERNS)
+            Arg::with_name(PATTERNS)
                 .required(true)
-                .about("can contain multiple patterns separated by newlines."),
+                .help("can contain multiple patterns separated by newlines."),
         )
         .arg(
-            Arg::new(FILE)
+            Arg::with_name(FILE)
                 .min_values(1)
-                .about("when FILE is '-', read standard input."),
+                .help("when FILE is '-', read standard input."),
         )
         .arg(
-            Arg::new(LINE_NUMBER)
+            Arg::with_name(LINE_NUMBER)
                 .long("line-number")
-                .short('n')
-                .about("print line number with output lines."),
+                .short("n")
+                .help("print line number with output lines."),
         )
         .arg(
-            Arg::new(RECURSIVE)
+            Arg::with_name(RECURSIVE)
                 .long("recursive")
-                .short('R')
-                .about("search recursive in folders."),
+                .short("R")
+                .help("search recursive in folders."),
         )
         .arg(
-            Arg::new(IGNORE_CASE)
+            Arg::with_name(IGNORE_CASE)
                 .long("ignore-case")
-                .short('i')
-                .about("ignore case distinctions in patterns and data."),
+                .short("i")
+                .help("ignore case distinctions in patterns and data."),
         )
         .get_matches();
 
