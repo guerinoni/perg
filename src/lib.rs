@@ -44,7 +44,10 @@ fn search_in_file(
         return items;
     }
 
-    let file = fs::File::open(filename).expect("can't open file");
+    let file = match fs::File::open(filename) {
+        Ok(f) => f,
+        Err(_) => return vec![],
+    };
     let lines = io::BufReader::new(file).lines();
     for (idx, str) in lines.enumerate() {
         if let Ok(item) = str {
