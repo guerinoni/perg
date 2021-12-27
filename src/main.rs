@@ -5,6 +5,7 @@ const PATTERNS: &str = "PATTERNS";
 const FILE: &str = "FILE";
 const LINE_NUMBER: &str = "line-number";
 const RECURSIVE: &str = "recursive";
+const DEREFERENCE_RECURSIVE: &str = "dereference-recursive";
 const IGNORE_CASE: &str = "ignore-case";
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -17,7 +18,7 @@ fn main() {
         .arg(
             Arg::with_name(PATTERNS)
                 .required(true)
-                .help("can contain multiple patterns separated by newlines."),
+                .help("can contain multiple patterns separated by newlines"),
         )
         .arg(
             Arg::with_name(FILE)
@@ -28,19 +29,29 @@ fn main() {
             Arg::with_name(LINE_NUMBER)
                 .long("line-number")
                 .short("n")
-                .help("print line number with output lines."),
+                .help("print line number with output lines.")
+                .display_order(1),
         )
         .arg(
             Arg::with_name(RECURSIVE)
                 .long("recursive")
                 .short("r")
-                .help("search recursive in folders."),
+                .help("search recursive in folders.")
+                .display_order(2),
+        )
+        .arg(
+            Arg::with_name(DEREFERENCE_RECURSIVE)
+                .long("dereference-recursive")
+                .short("R")
+                .help("likewise, but follow all symlinks")
+                .display_order(3),
         )
         .arg(
             Arg::with_name(IGNORE_CASE)
                 .long("ignore-case")
                 .short("i")
-                .help("ignore case distinctions in patterns and data."),
+                .help("ignore case distinctions in patterns and data.")
+                .display_order(0),
         )
         .get_matches();
 
@@ -49,6 +60,7 @@ fn main() {
         matches.values_of(FILE).unwrap_or_default().collect(),
         matches.is_present(LINE_NUMBER),
         matches.is_present(RECURSIVE),
+        matches.is_present(DEREFERENCE_RECURSIVE),
         matches.is_present(IGNORE_CASE),
     );
 

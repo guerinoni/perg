@@ -10,6 +10,7 @@ pub struct Config<'a> {
     filenames: Vec<&'a str>,
     line_number: bool,
     recursive: bool,
+    recursive_following_symlink: bool,
     ignore_case: bool,
 }
 
@@ -19,6 +20,7 @@ impl<'a> Config<'a> {
         filenames: Vec<&'a str>,
         line_number: bool,
         recursive: bool,
+        recursive_following_symlink: bool,
         ignore_case: bool,
     ) -> Config<'a> {
         Config {
@@ -26,6 +28,7 @@ impl<'a> Config<'a> {
             filenames,
             line_number,
             recursive,
+            recursive_following_symlink,
             ignore_case,
         }
     }
@@ -78,12 +81,15 @@ fn search_in_file(
 
 pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
     let mut items = Vec::new();
-    if c.recursive {
+    if c.recursive || c.recursive_following_symlink {
         if c.filenames.is_empty() {
             c.filenames = vec!["./"];
         }
         for entry in WalkDir::new(c.filenames.get(0).unwrap()).skip_hidden(true) {
             let entry = entry.unwrap();
+            if !c.recursive_following_symlink && entry.path_is_symlink() {
+                continue;
+            }
             let mut res = search_in_file(
                 entry.path().to_str().unwrap(),
                 c.pattern,
@@ -138,14 +144,14 @@ mod tests {
 
     #[test]
     fn return_path_invalid() {
-        let c = Config::new("hello", vec!["/home/invalid"], false, false, false);
+        let c = Config::new("hello", vec!["/home/invalid"], false, false, false, false);
         let r = grep(c);
         assert_eq!(r, Err("No such file or directory"));
     }
 
     #[test]
     fn grep_single_file() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], false, false, false);
+        let c = Config::new("federico", vec!["./Cargo.toml"], false, false, false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -160,6 +166,7 @@ mod tests {
             false,
             false,
             false,
+            false,
         );
         let r = grep(c);
         assert_eq!(r, Ok(vec![]));
@@ -170,6 +177,7 @@ mod tests {
         let c = Config::new(
             "federico guerinoni",
             vec!["./Cargo.toml"],
+            false,
             false,
             false,
             true,
@@ -191,6 +199,7 @@ mod tests {
             false,
             false,
             false,
+            false,
         );
         let r = grep(c);
         assert_eq!(
@@ -204,7 +213,7 @@ mod tests {
 
     #[test]
     fn grep_single_file_with_line_number() {
-        let c = Config::new("federico", vec!["./Cargo.toml"], true, false, false);
+        let c = Config::new("federico", vec!["./Cargo.toml"], true, false, false, false);
         let r = grep(c);
         assert_eq!(
             r,
@@ -217,7 +226,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
-        let c = Config::new("you", vec!["./testdata"], false, true, false);
+        let c = Config::new("you", vec!["./testdata"], false, true, false, false);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(r, vec!["\"./testdata/folder/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": Third dominion you're had called green.", "\"./testdata/folder/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": Third dominion you're had called green.", "\"./testdata/lol\": Tree brought multiply land darkness had dry you're of."]);
@@ -226,7 +235,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_ignore_case() {
-        let c = Config::new("you", vec!["./testdata"], false, true, true);
+        let c = Config::new("you", vec!["./testdata"], false, true, false, true);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(r ,vec!["\"./testdata/folder/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": Third dominion you're had called green.", "\"./testdata/folder/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/folder/lol\": You.", "\"./testdata/lol\": Evening green fill you'll gathering above hath.", "\"./testdata/lol\": He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": Third dominion you're had called green.", "\"./testdata/lol\": Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": You."]);
@@ -235,7 +244,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_without_specify_folder() {
-        let c = Config::new("you", vec![], false, true, false);
+        let c = Config::new("you", vec![], false, true, false, false);
         let r = grep(c);
         assert!(r.is_ok());
     }
@@ -243,7 +252,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
-        let c = Config::new("you", vec!["./testdata"], true, true, false);
+        let c = Config::new("you", vec!["./testdata"], true, true, false, false);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(r, vec!["\"./testdata/folder/lol\": 19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/folder/lol\": 25: Third dominion you're had called green.", "\"./testdata/folder/lol\": 26: Evening green fill you'll gathering above hath.", "\"./testdata/folder/lol\": 8: Tree brought multiply land darkness had dry you're of.", "\"./testdata/lol\": 19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", "\"./testdata/lol\": 25: Third dominion you're had called green.", "\"./testdata/lol\": 26: Evening green fill you'll gathering above hath.", "\"./testdata/lol\": 8: Tree brought multiply land darkness had dry you're of."]);
