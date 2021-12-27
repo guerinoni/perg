@@ -33,7 +33,7 @@ fn main() {
         .arg(
             Arg::with_name(RECURSIVE)
                 .long("recursive")
-                .short("R")
+                .short("r")
                 .help("search recursive in folders."),
         )
         .arg(
