@@ -16,40 +16,40 @@ fn main() {
         .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
         .about("grep like tool. Search for PATTERNS in each FILE.")
         .arg(
-            Arg::with_name(PATTERNS)
+            Arg::new(PATTERNS)
                 .required(true)
                 .help("can contain multiple patterns separated by newlines"),
         )
         .arg(
-            Arg::with_name(FILE)
+            Arg::new(FILE)
                 .min_values(1)
                 .help("when FILE is '-', read standard input."),
         )
         .arg(
-            Arg::with_name(LINE_NUMBER)
+            Arg::new(LINE_NUMBER)
                 .long("line-number")
-                .short("n")
+                .short('n')
                 .help("print line number with output lines.")
                 .display_order(1),
         )
         .arg(
-            Arg::with_name(RECURSIVE)
+            Arg::new(RECURSIVE)
                 .long("recursive")
-                .short("r")
+                .short('r')
                 .help("search recursive in folders.")
                 .display_order(2),
         )
         .arg(
-            Arg::with_name(DEREFERENCE_RECURSIVE)
+            Arg::new(DEREFERENCE_RECURSIVE)
                 .long("dereference-recursive")
-                .short("R")
+                .short('R')
                 .help("likewise, but follow all symlinks")
                 .display_order(3),
         )
         .arg(
-            Arg::with_name(IGNORE_CASE)
+            Arg::new(IGNORE_CASE)
                 .long("ignore-case")
-                .short("i")
+                .short('i')
                 .help("ignore case distinctions in patterns and data.")
                 .display_order(0),
         )
