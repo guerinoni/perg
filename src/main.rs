@@ -1,5 +1,5 @@
 use clap::{App, Arg};
-use perg::*;
+use perg::{grep, Config};
 
 const PATTERNS: &str = "PATTERNS";
 const FILE: &str = "FILE";
