@@ -7,6 +7,7 @@ const LINE_NUMBER: &str = "line-number";
 const RECURSIVE: &str = "recursive";
 const DEREFERENCE_RECURSIVE: &str = "dereference-recursive";
 const IGNORE_CASE: &str = "ignore-case";
+const EXCLUDE_DIR: &str = "exclude-dir";
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -23,13 +24,13 @@ fn main() {
         .arg(
             Arg::new(FILE)
                 .min_values(1)
-                .help("when FILE is '-', read standard input."),
+                .help("when FILE is '-', read standard input"),
         )
         .arg(
             Arg::new(LINE_NUMBER)
                 .long("line-number")
                 .short('n')
-                .help("print line number with output lines.")
+                .help("print line number with output lines")
                 .display_order(1),
         )
         .arg(
@@ -47,6 +48,13 @@ fn main() {
                 .display_order(3),
         )
         .arg(
+            Arg::new(EXCLUDE_DIR)
+                .long("--exclude-dir")
+                .number_of_values(1)
+                .help("skip directories that match GLOB")
+                .display_order(4),
+        )
+        .arg(
             Arg::new(IGNORE_CASE)
                 .long("ignore-case")
                 .short('i')
@@ -62,6 +70,7 @@ fn main() {
         matches.is_present(RECURSIVE),
         matches.is_present(DEREFERENCE_RECURSIVE),
         matches.is_present(IGNORE_CASE),
+        matches.value_of(EXCLUDE_DIR),
     );
 
     match grep(c) {
