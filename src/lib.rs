@@ -88,7 +88,10 @@ pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
         if c.filenames.is_empty() {
             c.filenames = vec!["./"];
         }
-        for entry in WalkDir::new(c.filenames.get(0).unwrap()).skip_hidden(true) {
+        for entry in WalkDir::new(c.filenames.get(0).unwrap())
+            .skip_hidden(true)
+            .parallelism(jwalk::Parallelism::RayonDefaultPool)
+        {
             let entry = entry.unwrap();
             if !c.recursive_following_symlink && entry.path_is_symlink() {
                 continue;

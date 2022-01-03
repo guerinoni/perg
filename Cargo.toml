@@ -5,7 +5,7 @@ authors = ["Federico Guerinoni <guerinoni.federico@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-jwalk = "0.5"
+jwalk = "0.6.0"
 clap = "3.0.0"
 
 [dev-dependencies]
