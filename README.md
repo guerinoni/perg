@@ -16,6 +16,7 @@ Grep implementation in rust.
 - [x] search in a directory.
 - [x] search recursive (-r or --recursive)
 - [x] search recursive following symlink (-R or --dereference-recursive)
+- [x] exclude some dir (--exclude-dir=folder)
 
 ## Contributing
 
