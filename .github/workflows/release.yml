@@ -19,7 +19,7 @@ jobs:
           
           - os: windows-latest
             artifact_name: ./target/release/perg.exe
-            asset_name: perg-windows-amd64
+            asset_name: perg-windows-amd64.exe
           
           - os: macos-latest
             artifact_name: ./target/release/perg
