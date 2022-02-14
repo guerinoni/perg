@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 jwalk = "0.6.0"
-clap = "3.0.0"
+clap = "3.0.14"
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
