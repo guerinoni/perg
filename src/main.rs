@@ -1,4 +1,4 @@
-use clap::{App, Arg};
+use clap::{Arg, Command};
 use perg::{grep, Config};
 
 const PATTERNS: &str = "PATTERNS";
@@ -12,7 +12,7 @@ const EXCLUDE_DIR: &str = "exclude-dir";
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
-    let matches = App::new("perg")
+    let matches = Command::new("perg")
         .version(VERSION)
         .author("Federico Guerinoni <guerinoni.federico@gmail.com>")
         .about("grep like tool. Search for PATTERNS in each FILE.")
