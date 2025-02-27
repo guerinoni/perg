@@ -1,6 +1,6 @@
+use clap::ArgAction::SetTrue;
 use clap::{Arg, Command};
 use perg::{Config, grep};
-use clap::ArgAction::SetTrue;
 const PATTERNS: &str = "PATTERNS";
 const FILE: &str = "FILE";
 const LINE_NUMBER: &str = "line-number";
@@ -25,7 +25,7 @@ fn main() {
         )
         .arg(
             Arg::new(FILE)
-            .num_args(1..)
+                .num_args(1..)
                 .help("when FILE is '-', read standard input"),
         )
         .arg(
@@ -85,11 +85,14 @@ fn main() {
         )
         .get_matches();
 
-        let patterns = matches.get_one::<String>(PATTERNS).expect("patterns are required");
-        let files: Vec<String> = matches.get_many::<String>(FILE)
-            .map(|vals| vals.cloned().collect())
-            .unwrap_or_default();
-        let file_refs: Vec<&str> = files.iter().map(String::as_str).collect();
+    let patterns = matches
+        .get_one::<String>(PATTERNS)
+        .expect("patterns are required");
+    let files: Vec<String> = matches
+        .get_many::<String>(FILE)
+        .map(|vals| vals.cloned().collect())
+        .unwrap_or_default();
+    let file_refs: Vec<&str> = files.iter().map(String::as_str).collect();
 
     let c = Config::new(
         patterns,
@@ -102,7 +105,6 @@ fn main() {
         matches.get_one::<usize>(AFTER_CONTEXT).copied(),
         matches.get_one::<usize>(BEFORE_CONTEXT).copied(),
     );
-
 
     match grep(c) {
         Ok(results) => {

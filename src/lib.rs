@@ -20,6 +20,7 @@ pub struct Config<'a> {
 }
 
 impl<'a> Config<'a> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         pattern: &'a str,
         filenames: Vec<&'a str>,
@@ -113,10 +114,8 @@ fn search_in_file(
     let mut after_unpushed_contexts_map: HashMap<usize, bool> = HashMap::new();
 
     for (idx, str) in lines.enumerate() {
-        if show_context {
-            if pushed_map.contains_key(&idx) {
-                continue;
-            }
+        if show_context && pushed_map.contains_key(&idx) {
+            continue;
         }
         if let Ok(item) = str {
             let mut item_ = item.clone();
@@ -175,23 +174,20 @@ fn search_in_file(
                         after_unpushed_contexts_map.insert(idx + i, true);
                     }
                 }
-            } else {
-                if after_context_num.is_some() {
-                    if after_unpushed_contexts_map.contains_key(&idx) {
-                        let mut s = String::from("");
-                        if show_filename {
-                            s = format!("{}:", filename);
-                        }
-                        if show_line_number {
-                            s = format!("{}{}: ", s, idx + 1);
-                        }
+            } else if after_context_num.is_some() && after_unpushed_contexts_map.contains_key(&idx)
+            {
+                let mut s = String::from("");
+                if show_filename {
+                    s = format!("{}:", filename);
+                }
+                if show_line_number {
+                    s = format!("{}{}: ", s, idx + 1);
+                }
 
-                        s.push_str(item.as_str());
-                        items.push(s);
-                        if show_context {
-                            pushed_map.insert(idx, true);
-                        }
-                    }
+                s.push_str(item.as_str());
+                items.push(s);
+                if show_context {
+                    pushed_map.insert(idx, true);
                 }
             }
         }
@@ -257,10 +253,8 @@ pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
 
         let stdin = io::stdin();
         for (idx, line) in stdin.lock().lines().enumerate() {
-            if show_context {
-                if pushed_map.contains_key(&idx) {
-                    continue;
-                }
+            if show_context && pushed_map.contains_key(&idx) {
+                continue;
             }
 
             let item = line.unwrap_or_default();
@@ -317,20 +311,18 @@ pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
                         after_unpushed_contexts_map.insert(idx + i, true);
                     }
                 }
-            } else {
-                if c.after_context_num.is_some() {
-                    if after_unpushed_contexts_map.contains_key(&idx) {
-                        let mut s = String::from("");
-                        if c.line_number {
-                            s = format!("{}{}: ", s, idx + 1);
-                        }
+            } else if c.after_context_num.is_some()
+                && after_unpushed_contexts_map.contains_key(&idx)
+            {
+                let mut s = String::from("");
+                if c.line_number {
+                    s = format!("{}{}: ", s, idx + 1);
+                }
 
-                        s.push_str(item.as_str());
-                        println!("{}", s);
-                        if show_context {
-                            pushed_map.insert(idx, true);
-                        }
-                    }
+                s.push_str(item.as_str());
+                println!("{}", s);
+                if show_context {
+                    pushed_map.insert(idx, true);
                 }
             }
         }
@@ -531,7 +523,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
-        let c = Config::new("you", vec!["./testdata"], false, true, false, false, None);
+        let c = Config::new("you", vec!["./testdata"], false, true, false, false, None,None,None);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
@@ -552,7 +544,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_ignore_case() {
-        let c = Config::new("you", vec!["./testdata"], false, true, false, true, None);
+        let c = Config::new("you", vec!["./testdata"], false, true, false, true, None,None,None);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
@@ -575,7 +567,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_without_specify_folder() {
-        let c = Config::new("you", vec![], false, true, false, false, None);
+        let c = Config::new("you", vec![], false, true, false, false, None,None,None);
         let r = grep(c);
         assert!(r.is_ok());
     }
@@ -583,7 +575,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
-        let c = Config::new("you", vec!["./testdata"], true, true, false, false, None);
+        let c = Config::new("you", vec!["./testdata"], true, true, false, false, None,None,None);
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
@@ -612,6 +604,8 @@ mod tests {
             false,
             false,
             Some("folder"),
+            None,
+            None,
         );
         let mut r = grep(c).unwrap();
         r.sort();
