@@ -2,11 +2,11 @@
 name = "perg"
 version = "0.5.0"
 authors = ["Federico Guerinoni <guerinoni.federico@gmail.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 jwalk = "0.6.0"
-clap = "3.2.17"
+clap = "4.5.31"
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
