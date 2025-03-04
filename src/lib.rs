@@ -523,7 +523,17 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder() {
-        let c = Config::new("you", vec!["./testdata"], false, true, false, false, None,None,None);
+        let c = Config::new(
+            "you",
+            vec!["./testdata"],
+            false,
+            true,
+            false,
+            false,
+            None,
+            None,
+            None,
+        );
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
@@ -544,7 +554,17 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_ignore_case() {
-        let c = Config::new("you", vec!["./testdata"], false, true, false, true, None,None,None);
+        let c = Config::new(
+            "you",
+            vec!["./testdata"],
+            false,
+            true,
+            false,
+            true,
+            None,
+            None,
+            None,
+        );
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
@@ -567,7 +587,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_without_specify_folder() {
-        let c = Config::new("you", vec![], false, true, false, false, None,None,None);
+        let c = Config::new("you", vec![], false, true, false, false, None, None, None);
         let r = grep(c);
         assert!(r.is_ok());
     }
@@ -575,7 +595,17 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "windows"))]
     fn grep_folder_with_line_numbers() {
-        let c = Config::new("you", vec!["./testdata"], true, true, false, false, None,None,None);
+        let c = Config::new(
+            "you",
+            vec!["./testdata"],
+            true,
+            true,
+            false,
+            false,
+            None,
+            None,
+            None,
+        );
         let mut r = grep(c).unwrap();
         r.sort();
         assert_eq!(
