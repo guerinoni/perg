@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.5/.schema/devbox.schema.json",
+  "packages": {
+    "libiconv":    "latest",
+    "rustup":      "latest",
+    "pkg-config":  "latest",
+    "openssl_3_3": "3.3.2"
+  },
+  "shell": {
+    "init_hook": [
+      "if [ ! -d $RUSTUP_HOME/toolchains -o ! -d $RUSTUP_HOME/toolchains/stable ]; then rustup default 1.89.0; fi"
+    ],
+    "scripts": {
+      "test": ["cargo test"]
+    }
+  }
+}
