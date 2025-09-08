@@ -10,7 +10,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Run clippy
       run: cargo fmt -- --check
@@ -22,7 +22,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install Rust
       run: |
@@ -43,7 +43,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Run tests
       run: cargo test
@@ -55,17 +55,14 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install cargo-tarpaulin
       run: |
-        LINK="https://github.com/xd009642/tarpaulin/releases/download/0.18.0-alpha3/cargo-tarpaulin-0.18.0-alpha3-travis.tar.gz"
-        curl -L --output tarpaulin.tar.gz "$LINK"
-        tar -xzvf tarpaulin.tar.gz
-        chmod +x cargo-tarpaulin
+         cargo install cargo-tarpaulin
 
     - name: Run cargo-tarpaulin
-      run: ./cargo-tarpaulin tarpaulin --out Xml
+      run: cargo tarpaulin --out Xml
 
     - name: Upload to codecov.io
       uses: codecov/codecov-action@v5.4.0
