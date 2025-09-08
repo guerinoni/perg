@@ -98,15 +98,14 @@ pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
             }
             let path = entry.path();
             let p = path.to_str().unwrap();
-            if let Some(exclude) = c.exclude_dir {
-                if path
+            if let Some(exclude) = c.exclude_dir
+                && path
                     .parent()
                     .unwrap()
                     .ancestors()
                     .any(|p| p.ends_with(exclude))
-                {
-                    continue;
-                }
+            {
+                continue;
             }
             let mut res = search_in_file(p, c.pattern, c.line_number, true, c.ignore_case);
             items.append(&mut res);
@@ -268,16 +267,19 @@ mod tests {
         let c = Config::new("you", vec!["./testdata"], false, true, false, false, None);
         let mut r = grep(c).unwrap();
         r.sort();
-        assert_eq!(r, vec![
-            "./testdata/folder/lol:Evening green fill you'll gathering above hath.", 
-            "./testdata/folder/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", 
-            "./testdata/folder/lol:Third dominion you're had called green.", 
-            "./testdata/folder/lol:Tree brought multiply land darkness had dry you're of.", 
-            "./testdata/lol:Evening green fill you'll gathering above hath.", 
-            "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
-            "./testdata/lol:Third dominion you're had called green.", 
-            "./testdata/lol:Tree brought multiply land darkness had dry you're of."
-            ]);
+        assert_eq!(
+            r,
+            vec![
+                "./testdata/folder/lol:Evening green fill you'll gathering above hath.",
+                "./testdata/folder/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/folder/lol:Third dominion you're had called green.",
+                "./testdata/folder/lol:Tree brought multiply land darkness had dry you're of.",
+                "./testdata/lol:Evening green fill you'll gathering above hath.",
+                "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/lol:Third dominion you're had called green.",
+                "./testdata/lol:Tree brought multiply land darkness had dry you're of."
+            ]
+        );
     }
 
     #[test]
@@ -286,18 +288,21 @@ mod tests {
         let c = Config::new("you", vec!["./testdata"], false, true, false, true, None);
         let mut r = grep(c).unwrap();
         r.sort();
-        assert_eq!(r ,vec![
-            "./testdata/folder/lol:Evening green fill you'll gathering above hath.", 
-            "./testdata/folder/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", 
-            "./testdata/folder/lol:Third dominion you're had called green.", 
-            "./testdata/folder/lol:Tree brought multiply land darkness had dry you're of.", 
-            "./testdata/folder/lol:You.", 
-            "./testdata/lol:Evening green fill you'll gathering above hath.", 
-            "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", 
-            "./testdata/lol:Third dominion you're had called green.", 
-            "./testdata/lol:Tree brought multiply land darkness had dry you're of.", 
-            "./testdata/lol:You."
-            ]);
+        assert_eq!(
+            r,
+            vec![
+                "./testdata/folder/lol:Evening green fill you'll gathering above hath.",
+                "./testdata/folder/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/folder/lol:Third dominion you're had called green.",
+                "./testdata/folder/lol:Tree brought multiply land darkness had dry you're of.",
+                "./testdata/folder/lol:You.",
+                "./testdata/lol:Evening green fill you'll gathering above hath.",
+                "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/lol:Third dominion you're had called green.",
+                "./testdata/lol:Tree brought multiply land darkness had dry you're of.",
+                "./testdata/lol:You."
+            ]
+        );
     }
 
     #[test]
@@ -314,16 +319,19 @@ mod tests {
         let c = Config::new("you", vec!["./testdata"], true, true, false, false, None);
         let mut r = grep(c).unwrap();
         r.sort();
-        assert_eq!(r, vec![
-            "./testdata/folder/lol:19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", 
-            "./testdata/folder/lol:25: Third dominion you're had called green.",
-            "./testdata/folder/lol:26: Evening green fill you'll gathering above hath.", 
-            "./testdata/folder/lol:8: Tree brought multiply land darkness had dry you're of.", 
-            "./testdata/lol:19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.", 
-            "./testdata/lol:25: Third dominion you're had called green.", 
-            "./testdata/lol:26: Evening green fill you'll gathering above hath.", 
-            "./testdata/lol:8: Tree brought multiply land darkness had dry you're of."
-            ]);
+        assert_eq!(
+            r,
+            vec![
+                "./testdata/folder/lol:19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/folder/lol:25: Third dominion you're had called green.",
+                "./testdata/folder/lol:26: Evening green fill you'll gathering above hath.",
+                "./testdata/folder/lol:8: Tree brought multiply land darkness had dry you're of.",
+                "./testdata/lol:19: He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/lol:25: Third dominion you're had called green.",
+                "./testdata/lol:26: Evening green fill you'll gathering above hath.",
+                "./testdata/lol:8: Tree brought multiply land darkness had dry you're of."
+            ]
+        );
     }
 
     #[test]
@@ -340,11 +348,14 @@ mod tests {
         );
         let mut r = grep(c).unwrap();
         r.sort();
-        assert_eq!(r, vec![
-            "./testdata/lol:Evening green fill you'll gathering above hath.",
-            "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
-            "./testdata/lol:Third dominion you're had called green.", 
-            "./testdata/lol:Tree brought multiply land darkness had dry you're of."
-            ]);
+        assert_eq!(
+            r,
+            vec![
+                "./testdata/lol:Evening green fill you'll gathering above hath.",
+                "./testdata/lol:He divide for appear deep abundantly. Had above unto. Moving stars fish. Whose you'll can't beginning sixth.",
+                "./testdata/lol:Third dominion you're had called green.",
+                "./testdata/lol:Tree brought multiply land darkness had dry you're of."
+            ]
+        );
     }
 }
