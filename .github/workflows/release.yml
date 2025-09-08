@@ -11,9 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             artifact_name: ./target/release/perg
             asset_name: perg-linux-amd64
           
@@ -43,7 +43,7 @@ jobs:
 
     
   embedded:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Check out code
       uses: actions/checkout@v4
