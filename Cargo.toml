@@ -5,8 +5,8 @@ authors = ["Federico Guerinoni <guerinoni.federico@gmail.com>"]
 edition = "2024"
 
 [dependencies]
-jwalk = "0.6.0"
 clap = "3.2.17"
+jwalk = "0.8"
 
 [dev-dependencies]
 pretty_assertions = "1"

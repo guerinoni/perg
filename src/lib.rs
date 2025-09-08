@@ -1,3 +1,4 @@
+use core::time;
 use jwalk::WalkDir;
 use std::{
     fs,
@@ -90,7 +91,9 @@ pub fn grep(mut c: Config) -> Result<Vec<String>, &'static str> {
         }
         for entry in WalkDir::new(c.filenames.first().unwrap())
             .skip_hidden(true)
-            .parallelism(jwalk::Parallelism::RayonDefaultPool)
+            .parallelism(jwalk::Parallelism::RayonDefaultPool {
+                busy_timeout: time::Duration::from_secs(1),
+            })
         {
             let entry = entry.unwrap();
             if !c.recursive_following_symlink && entry.path_is_symlink() {
